@@ -9,21 +9,21 @@ int main(int argc, char* argv[])
 {
     int A1,A2;
     if(error(argc) !=0 ){//проверка правильности ввода аргументов
-        std::cout << -1;
+        std::cout << -1 << "\n";
         return -1;
     }
     for (int i = 2; i <= argc; i += 2){
           A1 = atoi(argv[i-1]);
           A2 = atoi(argv[i]);
     if(A1 == A2){   //если пара чисел равны
-        cout << point(A1)<<" ";
+        cout << point(A1) << "\n";
         return point(A1);
     }
     if(A1 > A2){    //если первое число больше,то ошибка
-        cout << 0;
+        cout << 0 << "\n";
         return 0;
     }  
-    cout << count(A1,A2)<<"\n";
+    cout << count(A1,A2) <<"\n";
     }
     return 0;
 }
