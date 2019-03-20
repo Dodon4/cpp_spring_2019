@@ -1,34 +1,30 @@
 #include "numbers.dat"
 #include <iostream>
+using namespace std;
 int checkSimple(int x);
 int error(int argc);
 int point(int A1);
 int count(int A1,int A2);
 int main(int argc, char* argv[])
 {
+    int A1,A2;
     if(error(argc) !=0 ){//проверка правильности ввода аргументов
-        std::cout << -1 << "\n";
+        std::cout << -1;
         return -1;
     }
-    int A1 = std::atoi(argv[1]);
-    int A2 = std::atoi(argv[2]);
-    for (int i = 4; i <= argc; i += 2){
-      if(std::atoi(argv[i-1]) > A1)
-          A1 = std::atoi(argv[i-1]);
-      if(std::atoi(argv[i]) < A2)
-          A2 = std::atoi (argv[i]);
-    }
+    for (int i = 2; i <= argc; i += 2){
+          A1 = atoi(argv[i-1]);
+          A2 = atoi(argv[i]);
     if(A1 == A2){   //если пара чисел равны
-        std::cout << point(A1) << "\n";
+        cout << point(A1)<<" ";
         return point(A1);
     }
     if(A1 > A2){    //если первое число больше,то ошибка
-        std::cout << 0 <<"\n";
+        cout << 0;
         return 0;
+    }  
+    cout << count(A1,A2)<<"\n";
     }
-    
-      
-    std::cout << count(A1,A2) << "\n";
     return 0;
 }
 
@@ -83,5 +79,4 @@ int count(int A1,int A2){   //подсчет простых чисел
     for(int k = con1; k <= con2; k++)
         sum += checkSimple(Data[k]);    //число простых чисел
     return sum;
-
 }
