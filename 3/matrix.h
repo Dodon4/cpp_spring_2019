@@ -88,11 +88,10 @@ public:
 		bool operator!=(const Matrix& other) const {
 			return !(*this == other);
 		}
-	int getRows() {
+	size_t getRows() const {
 		return rows;
 	}
-	int getColumns() {
+	size_t getColumns() const {
 		return columns;
 	}
 };
-
