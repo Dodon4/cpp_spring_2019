@@ -98,7 +98,6 @@ private:
 	        return Error::CorruptedArchive;
 	    return Error::NoError;
 	}
-	template <class... ArgsT>
 	Error process()
 	{
 		return Error::CorruptedArchive;
