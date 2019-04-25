@@ -5,10 +5,10 @@
 std::mutex m;
 std::condition_variable dataReady;
 bool ready = false;
-
+const int n = 500000;
 void ping() {
 	std::unique_lock<std::mutex> lock(m);
-	for (int i = 0; i < 500000; ++i) {
+	for (int i = 0; i < n; ++i) {
 
 		while (ready)
 			dataReady.wait(lock);
@@ -21,7 +21,7 @@ void ping() {
 
 void pong() {
 	std::unique_lock<std::mutex> lock(m);
-	for (int i = 0; i < 500000; ++i) {
+	for (int i = 0; i < n; ++i) {
 		while (!ready)
 			dataReady.wait(lock);
 
