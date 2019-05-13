@@ -7,7 +7,7 @@
 #include <queue>
 #include <string>
 constexpr auto data = "data.bin";
-constexpr size_t mem = 8 * 1024 * 1024;
+constexpr size_t mem = 6 * 1024 * 1024;
 constexpr int tNum = 2;
 constexpr size_t tMem = mem / tNum;
 constexpr size_t tMemUint = tMem / sizeof(uint64_t);
@@ -21,9 +21,9 @@ std::mutex outQueM;
 std::mutex streamReadM;
 std::mutex iterFinishM;
 
-void pr(uint64_t * numbers, std::ifstream & Sdata, int id, std::queue<std::string>&outF) {
-	int i = 0;
+void split(uint64_t * numbers, std::ifstream & Sdata, int id, std::queue<std::string>&outF) {
 	int f = 0;
+	
 	while (!Sdata.eof()) {
 		std::unique_lock<std::mutex> lock(streamReadM);
 		Sdata.read(reinterpret_cast<char *>(numbers), tMemUint * sizeof(uint64_t));
@@ -31,16 +31,17 @@ void pr(uint64_t * numbers, std::ifstream & Sdata, int id, std::queue<std::strin
 		lock.unlock();
 		if (curSize != 0) {
 			std::sort(numbers, numbers + curSize);
-			std::string name = std::to_string(i) + '.' + std::to_string(id) + "." + std::to_string(f) + ".bin";
+			std::string name = std::to_string(0) + '.' + std::to_string(id) + "." + std::to_string(f) + ".bin";
 			std::ofstream out(name, std::ios::binary);
 			out.write(reinterpret_cast<char*>(numbers), curSize * sizeof(uint64_t));
 			outF.push(name);
 			++f;
 		}
 	}
+
 }
 
-void wr(std::string & str1, std::string & str2, uint64_t * num, int id, int i, int f, std::queue<std::string>&outF) {
+void merge(std::string & str1, std::string & str2, uint64_t * num, int id, int i, int f, std::queue<std::string>&outF) {
 	std::ifstream f1(str1, std::ios::binary);
 	std::ifstream f2(str2, std::ios::binary);
 	std::string name = std::to_string(i) + '.' + std::to_string(id) + '.' + std::to_string(f) + ".bin";
@@ -112,7 +113,7 @@ void Sort(uint64_t * nums, std::ifstream & Sdata, int id, std::queue<std::string
 	int i = 0;
 	int f = 0;
 
-	pr(numbers, Sdata, id, outF);
+	split(numbers, Sdata, id, outF);
 
 	++i;
 	std::unique_lock<std::mutex> lock(iterFinishM);
@@ -129,7 +130,7 @@ void Sort(uint64_t * nums, std::ifstream & Sdata, int id, std::queue<std::string
 			std::string tmp2 = outF.front();
 			outF.pop();
 			qLock.unlock();
-			wr(tmp1, tmp2, numbers, id, i, f, outF);
+			merge(tmp1, tmp2, numbers, id, i, f, outF);
 			++f;
 	}
 	std::unique_lock<std::mutex> fLock(sortFinishM);
@@ -146,8 +147,10 @@ int main() {
 	std::ifstream Sdata(data, std::ios::binary);
 	std::queue<std::string> outF;
 	std::vector<std::thread> threads;
+	if (!Sdata)
+		throw std::invalid_argument("can't open file");
 	for (int i = 0; i < tNum; ++i)
-		threads.emplace_back(Sort, std::ref(nums), std::ref(Sdata), i, std::ref(outF));
+		threads.emplace_back(Sort, std::ref(nums),std::ref(Sdata), i, std::ref(outF));
 	for (int i = 0; i < tNum; ++i)
 		threads[i].join();
 	delete[] nums;
